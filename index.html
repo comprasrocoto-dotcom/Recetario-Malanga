@@ -177,7 +177,7 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 
 <script>
 const SID='10o7stR6GLsko2C3tSSn0Wo-MU26iTOxg';
-const PROXY='https://corsproxy.io/?';
+const PROXY='';
 const SHEETS=[
   {name:'COMBOS',icon:'🍗',section:'COCINA'},
   {name:'ALITAS',icon:'🔥',section:'COCINA'},
@@ -298,7 +298,7 @@ function parseRecipes(rows,sheetName){
 async function loadSheet(sheet){
   const url='https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&sheet='+encodeURIComponent(sheet.name);
   try{
-    const r=await fetch(PROXY+encodeURIComponent(url));
+    const r=await fetch(url);
     if(!r.ok)throw new Error('HTTP '+r.status);
     const t=await r.text();
     if(t.includes('/*O_o*/')||t.includes('<!DOCTYPE'))throw new Error('Not CSV');
