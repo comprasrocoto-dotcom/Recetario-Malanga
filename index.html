@@ -330,7 +330,7 @@ function buildSidebar(){
     h+='<div class="sidebar-section">'+sec+'</div>';
     items.forEach(s=>{
       const id='si-'+s.name.replace(/ /g,'_');
-      h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat('"+s.name+"')">'
+            h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(\''+s.name+'\')">'
         +'<span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span>'
         +'<span class="si-count">'+s.count+'</span></div>';
     });
