@@ -12,7 +12,7 @@
   --white:#fff;--shadow:0 2px 12px rgba(0,0,0,.1);
 }
 body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var(--dark);display:flex;min-height:100vh}
-.sidebar{width:260px;min-width:260px;background:var(--white);border-right:1px solid var(--cream2);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar{width:260px;min-width:260px;background:var(--white);hborder-right:1px solid var(--cream2);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
 .sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid var(--cream2)}
 .logo-box{display:flex;align-items:center;gap:12px}
 .logo-icon{width:44px;height:44px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
@@ -330,7 +330,7 @@ function buildSidebar(){
     h+='<div class="sidebar-section">'+sec+'</div>';
     items.forEach(s=>{
       const id='si-'+s.name.replace(/ /g,'_');
-      h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(''+s.name+'')">'
+      h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat('"+s.name+"')">'
         +'<span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span>'
         +'<span class="si-count">'+s.count+'</span></div>';
     });
