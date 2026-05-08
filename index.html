@@ -212,7 +212,7 @@ const SHEETS=[
 let allRecipes=[],currentCat='ALL',viewMode='grid',searchQ='';
 function parseCSV(t){const rows=[];for(const line of t.split('\n')){const cols=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=ch;}cols.push(cur.trim());rows.push(cols);}return rows;}
 function cleanVal(v){if(!v)return null;const s=v.replace(/[^\d.,\-]/g,'').replace(',','.').trim();const n=parseFloat(s);return isNaN(n)?null:n;}
-const SKIP_RE=/^(art[\u00ED]culo|ingrediente|und\b|unidad|coste|costo|item|total|columna)/i;
+const SKIP_RE=/^(art[\u00CDculo|art\u00EDculo|artículo|articulo|art\u00C3|ingrediente|und\b|unidad|coste|costo|item|total|columna)/i;
 const UNIT_WORDS=['g','kg','uds','und','ml','l','oz','lb','gr','cc','porciones','onz'];
 function isUnit(v){return UNIT_WORDS.includes((v||'').toLowerCase().trim());}
 function parseRecipes(rows,sheetName){
@@ -221,7 +221,7 @@ function parseRecipes(rows,sheetName){
     const c0=(row[0]||'').trim();const c1=(row[1]||'').trim();const c2=(row[2]||'').trim();const c3=(row[3]||'').trim();const c12=(row[12]||'').trim();
     const mLow=c12.toLowerCase();const isSL=mLow==='preparacion'||mLow==='preparación'||mLow==='emplatado';
     const isStep=c12&&!isSL&&c12.length>3&&!c12.includes('$')&&!c12.includes('#');
-    const isH=SKIP_RE.test(c1);
+    const isH=SKIP_RE.test(c1)||/^(unidad|unidades)/i.test(c2);
     const isRN=!c0&&c1&&!c2&&!c3&&!isH&&c1.length>2&&!isUnit(c1)&&!/^[\$#0-9]/.test(c1);
     if(isRN){cur={name:c1,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',_ip:false};recipes.push(cur);continue;}
     if(!cur)continue;
