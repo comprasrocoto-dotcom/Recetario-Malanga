@@ -79,12 +79,12 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 .modal-close{width:34px;height:34px;border:none;background:var(--cream2);border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;color:var(--mid);flex-shrink:0;transition:.2s}
 .modal-close:hover{background:var(--orange);color:var(--white)}
 .modal-body{overflow-y:auto;flex:1}
-.analysis-banner{background:var(--dark);color:var(--white);padding:14px 24px;display:flex;gap:24px;flex-wrap:wrap}
-.ab-item{display:flex;flex-direction:column;gap:2px}
-.ab-item label{font-size:.65rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em}
-.ab-val{font-size:1rem;font-weight:700}
-.ab-val.red{color:#ff6b6b}
-.ab-val.green{color:#69e080}
+
+
+
+
+
+
 .section-block{padding:20px 24px}
 .section-title{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--cream2)}
 .ing-table{width:100%;border-collapse:collapse;font-size:.85rem}
@@ -178,20 +178,36 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 <script>
 const SID='10o7stR6GLsko2C3tSSn0Wo-MU26iTOxg';
 const SHEETS=[
-  {name:'COMBOS',gid:'927100624',icon:'🍗',section:'COCINA'},
-  {name:'ALITAS',gid:'1969518266',icon:'🔥',section:'COCINA'},
-  {name:'ENTRE PANES',gid:'945235689',icon:'🍔',section:'COCINA'},
-  {name:'TEX MEX',gid:'1983252607',icon:'🌮',section:'COCINA'},
-  {name:'PARRILLA',gid:'731841443',icon:'🥩',section:'COCINA'},
-  {name:'GUARNICIONES',gid:'1725043445',icon:'🍟',section:'COCINA'},
-  {name:'ENSALADAS',gid:'904728913',icon:'🥗',section:'COCINA'},
-  {name:'ENTRADAS',gid:'1694966311',icon:'🍢',section:'COCINA'},
-  {name:'MENU INFANTIL',gid:'416312829',icon:'🧒',section:'COCINA'},
-  {name:'POSTRES',gid:'791453397',icon:'🍮',section:'COCINA'},
-  {name:'DESAYUNOS',gid:'2119894248',icon:'🥐',section:'COCINA'},
-  {name:'EVENTOS',gid:'834911708',icon:'🎉',section:'ESPECIAL'},
-  {name:'SUB RECETAS COCINA',gid:'1117243696',icon:'📦',section:'ESPECIAL'},
-  {name:'SUB RECETAS BAR',gid:'603525191',icon:'🍹',section:'ESPECIAL'},
+{name:'COMBOS',gid:'927100624',icon:'🍗',section:'COCINA'},
+{name:'ALITAS',gid:'1969518266',icon:'🔥',section:'COCINA'},
+{name:'ENTRE PANES',gid:'945235689',icon:'🍔',section:'COCINA'},
+{name:'TEX MEX',gid:'1983252607',icon:'🌮',section:'COCINA'},
+{name:'PARRILLA',gid:'731841443',icon:'🥩',section:'COCINA'},
+{name:'GUARNICIONES',gid:'1725043445',icon:'🍟',section:'COCINA'},
+{name:'ENSALADAS',gid:'904728913',icon:'🥗',section:'COCINA'},
+{name:'ENTRADAS',gid:'1694966311',icon:'🍢',section:'COCINA'},
+{name:'MENU INFANTIL',gid:'416312829',icon:'🧒',section:'COCINA'},
+{name:'POSTRES',gid:'791453397',icon:'🍮',section:'COCINA'},
+{name:'DESAYUNOS',gid:'2119894248',icon:'🥐',section:'COCINA'},
+{name:'SUB RECETAS COCINA',gid:'1117243696',icon:'📦',section:'ESPECIAL'},
+{name:'SUB RECETAS BAR',gid:'1629668626',icon:'🍹',section:'ESPECIAL'},
+{name:'SODAS',gid:'1083424527',icon:'🥤',section:'BAR'},
+{name:'JUGOS',gid:'1165651199',icon:'🍊',section:'BAR'},
+{name:'BEBIDAS NO ALCOHOLICAS',gid:'1600183329',icon:'💧',section:'BAR'},
+{name:'MEZCLADORES',gid:'1796361065',icon:'🧃',section:'BAR'},
+{name:'MALTEADAS',gid:'2039065010',icon:'🥛',section:'BAR'},
+{name:'CHELADAS',gid:'271819557',icon:'🍺',section:'BAR'},
+{name:'JARRAS',gid:'603525191',icon:'🍺',section:'BAR'},
+{name:'COTELES TRADICIONALES',gid:'834911708',icon:'🍹',section:'BAR'},
+{name:'TEQUILA',gid:'1689258526',icon:'🥃',section:'BAR'},
+{name:'GINEGRA',gid:'2030883620',icon:'🍸',section:'BAR'},
+{name:'MEZCAL',gid:'831146238',icon:'🥃',section:'BAR'},
+{name:'CAFES',gid:'1041420439',icon:'☕',section:'BAR'},
+{name:'RON',gid:'1701802419',icon:'🥃',section:'BAR'},
+{name:'CERVEZAS',gid:'1233666965',icon:'🍺',section:'BAR'},
+{name:'AGUARDIENTE',gid:'1153313622',icon:'🥃',section:'BAR'},
+{name:'WHISKY',gid:'1475779010',icon:'🥃',section:'BAR'},
+{name:'COCTELES DE LA CASA',gid:'114262183',icon:'🍹',section:'BAR'},
 ];
 let allRecipes=[],currentCat='ALL',viewMode='grid',searchQ='';
 function parseCSV(t){const rows=[];for(const line of t.split('\n')){const cols=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=ch;}cols.push(cur.trim());rows.push(cols);}return rows;}
@@ -226,7 +242,7 @@ function handleSearch(){searchQ=document.getElementById('search-input').value.to
 function getFiltered(){let l=allRecipes;if(currentCat!=='ALL')l=l.filter(r=>r.category===currentCat);if(searchQ)l=l.filter(r=>r.name.toLowerCase().includes(searchQ)||r.ingredients.some(i=>i.name.toLowerCase().includes(searchQ)));return l;}
 function setView(m){viewMode=m;document.getElementById('btn-grid').classList.toggle('active',m==='grid');document.getElementById('btn-list').classList.toggle('active',m==='list');renderGrid();}
 function renderGrid(){const list=getFiltered();const cat=currentCat==='ALL'?'Todas las Recetas':currentCat.charAt(0)+currentCat.slice(1).toLowerCase();document.getElementById('page-title').textContent=cat;document.getElementById('page-sub').textContent=list.length+' receta'+(list.length===1?'':'s');const grid=document.getElementById('grid');grid.className='grid'+(viewMode==='list'?' list-mode':'');if(!list.length){grid.innerHTML='<div class="empty-state"><p>No se encontraron recetas</p></div>';return;}grid.innerHTML=list.map(r=>{const idx=allRecipes.indexOf(r);const steps=r.prepSteps.length+r.plateSteps.length;return '<div class="card" onclick="openModal('+idx+')">'+'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🍗</div><span>'+r.category+'</span></div></div>'+'<div class="card-body"><div class="card-cat">'+r.category+'</div><div class="card-name">'+r.name+'</div>'+'<div class="card-divider"></div><div class="card-meta">'+'<span>'+r.ingredients.length+' ingrediente'+(r.ingredients.length===1?'':'s')+'</span>'+(steps?'<span class="meta-steps">'+steps+' paso'+(steps===1?'':'s')+'</span>':'')+'</div></div></div>';}).join('');}
-function openModal(idx){const r=allRecipes[idx];if(!r)return;document.getElementById('m-cat').textContent=r.category;document.getElementById('m-name').textContent=r.name;const cv=r.analysis.costo||r.totalCost;let body='';if(cv!=null){body+='<div class="analysis-banner"><div class="ab-item"><label>Costo del Plato</label><div class="ab-val">$'+Math.round(cv).toLocaleString('es-CO')+'</div></div>';if(r.analysis.venta)body+='<div class="ab-item"><label>Valor de Venta</label><div class="ab-val red">$'+Math.round(r.analysis.venta).toLocaleString('es-CO')+'</div></div>';if(r.analysis.ganancia)body+='<div class="ab-item"><label>Ganancia</label><div class="ab-val green">$'+Math.round(r.analysis.ganancia).toLocaleString('es-CO')+'</div></div>';if(r.analysis.margen)body+='<div class="ab-item"><label>Margen</label><div class="ab-val">'+r.analysis.margen+'</div></div>';body+='</div>';}
+function openModal(idx){const r=allRecipes[idx];if(!r)return;document.getElementById('m-cat').textContent=r.category;document.getElementById('m-name').textContent=r.name;let body='';
 if(r.ingredients.length){body+='<div class="section-block"><div class="section-title">Ingredientes</div><table class="ing-table"><thead><tr><th>Artículo</th><th>Unidad de Medida</th><th>Cantidad</th></tr></thead><tbody>'+r.ingredients.map(i=>'<tr><td class="td-name">'+i.name+'</td><td>'+(i.unit||'-')+'</td><td>'+(i.qty||'-')+'</td></tr>').join('')+'</tbody></table></div>';}
 if(r.prepSteps.length||r.plateSteps.length){body+='<div class="steps-wrap">';if(r.prepSteps.length){body+='<div class="steps-section"><div class="steps-section-title">Preparación</div>'+r.prepSteps.map((s,i)=>'<div class="step-item"><div class="step-num orange">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')+'</div>';}if(r.plateSteps.length){body+='<div class="steps-section"><div class="steps-section-title">Emplatado</div>'+r.plateSteps.map((s,i)=>'<div class="step-item"><div class="step-num teal">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')+'</div>';}body+='</div>';}
 if(r.notes&&r.notes.trim()){body+='<div class="notes-block"><div class="notes-title">Notas de Cocina</div><div class="notes-text">'+r.notes.trim()+'</div></div>';}document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-bg').classList.add('open');document.body.style.overflow='hidden';}
