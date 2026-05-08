@@ -177,264 +177,62 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 
 <script>
 const SID='10o7stR6GLsko2C3tSSn0Wo-MU26iTOxg';
-const PROXY='';
 const SHEETS=[
-  {name:'COMBOS',icon:'🍗',section:'COCINA'},
-  {name:'ALITAS',icon:'🔥',section:'COCINA'},
-  {name:'ENTRE PANES',icon:'🍔',section:'COCINA'},
-  {name:'TEX MEX',icon:'🌮',section:'COCINA'},
-  {name:'PARRILLA',icon:'🥩',section:'COCINA'},
-  {name:'GUARNICIONES',icon:'🍟',section:'COCINA'},
-  {name:'ENSALADAS',icon:'🥗',section:'COCINA'},
-  {name:'ENTRADAS',icon:'🍢',section:'COCINA'},
-  {name:'MENU INFANTIL',icon:'🧒',section:'COCINA'},
-  {name:'POSTRES',icon:'🍮',section:'COCINA'},
-  {name:'DESAYUNOS',icon:'🥐',section:'COCINA'},
-  {name:'EVENTOS',icon:'🎉',section:'ESPECIAL'},
-  {name:'SUB RECETAS COCINA',icon:'📦',section:'ESPECIAL'},
-  {name:'SUB RECETAS BAR',icon:'🍹',section:'ESPECIAL'},
+  {name:'COMBOS',gid:'927100624',icon:'🍗',section:'COCINA'},
+  {name:'ALITAS',gid:'1969518266',icon:'🔥',section:'COCINA'},
+  {name:'ENTRE PANES',gid:'945235689',icon:'🍔',section:'COCINA'},
+  {name:'TEX MEX',gid:'1983252607',icon:'🌮',section:'COCINA'},
+  {name:'PARRILLA',gid:'731841443',icon:'🥩',section:'COCINA'},
+  {name:'GUARNICIONES',gid:'1725043445',icon:'🍟',section:'COCINA'},
+  {name:'ENSALADAS',gid:'904728913',icon:'🥗',section:'COCINA'},
+  {name:'ENTRADAS',gid:'1694966311',icon:'🍢',section:'COCINA'},
+  {name:'MENU INFANTIL',gid:'416312829',icon:'🧒',section:'COCINA'},
+  {name:'POSTRES',gid:'791453397',icon:'🍮',section:'COCINA'},
+  {name:'DESAYUNOS',gid:'2119894248',icon:'🥐',section:'COCINA'},
+  {name:'EVENTOS',gid:'834911708',icon:'🎉',section:'ESPECIAL'},
+  {name:'SUB RECETAS COCINA',gid:'1117243696',icon:'📦',section:'ESPECIAL'},
+  {name:'SUB RECETAS BAR',gid:'603525191',icon:'🍹',section:'ESPECIAL'},
 ];
 let allRecipes=[],currentCat='ALL',viewMode='grid',searchQ='';
-
-function parseCSV(t){
-  const rows=[];
-  for(const line of t.split('\n')){
-    const cols=[];let cur='',inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
-      else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}
-      else cur+=ch;
-    }
-    cols.push(cur.trim());rows.push(cols);
-  }
-  return rows;
-}
-
-function cleanVal(v){
-  if(!v)return null;
-  const s=v.replace(/[^\d.,\-]/g,'').replace(',','.').trim();
-  const n=parseFloat(s);return isNaN(n)?null:n;
-}
-function fmtMoney(v){
-  if(v===null||v===undefined)return '-';
-  return '$ '+Math.round(v).toLocaleString('es-CO');
-}
-
-const SKIP_RE=/^(art[ií]culo|ingrediente|und\b|unidad|coste|costo|item|total)/i;
-const UNIT_WORDS=['g','kg','uds','und','ml','l','oz','lb','gr','cc','porciones'];
+function parseCSV(t){const rows=[];for(const line of t.split('\n')){const cols=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=ch;}cols.push(cur.trim());rows.push(cols);}return rows;}
+function cleanVal(v){if(!v)return null;const s=v.replace(/[^\d.,\-]/g,'').replace(',','.').trim();const n=parseFloat(s);return isNaN(n)?null:n;}
+const SKIP_RE=/^(art[\u00ED]culo|ingrediente|und\b|unidad|coste|costo|item|total|columna)/i;
+const UNIT_WORDS=['g','kg','uds','und','ml','l','oz','lb','gr','cc','porciones','onz'];
 function isUnit(v){return UNIT_WORDS.includes((v||'').toLowerCase().trim());}
-
 function parseRecipes(rows,sheetName){
   const recipes=[];let cur=null;
   for(const row of rows){
-    const c0=(row[0]||'').trim();
-    const c1=(row[1]||'').trim();
-    const c2=(row[2]||'').trim();
-    const c3=(row[3]||'').trim();
-    const c4=(row[4]||'').trim();
-    const c5=(row[5]||'').trim();
-    const c6=(row[6]||'').trim();
-    const c7=(row[7]||'').trim();
-    const c9=(row[9]||'').trim();
-    const c10=(row[10]||'').trim();
-    const c12=(row[12]||'').trim();
-
-    // Process step text from col M (not section labels)
-    const mLow=c12.toLowerCase();
-    const isSectionLabel=mLow==='preparacion'||mLow==='preparación'||mLow==='emplatado';
-    const isNotes=mLow==='notas de cocina'||mLow==='notas';
-
-    // Recipe name: col A empty, col B filled, col C empty, not a header
-    const isHeader=SKIP_RE.test(c1);
-    const isRecipeName=!c0&&c1&&!c2&&!isHeader&&c1.length>2&&!isUnit(c1);
-    if(isRecipeName){
-      cur={name:c1,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',totalCost:null,_inPlate:false};
-      if(c12&&!isSectionLabel) cur.prepSteps.push(c12);
-      recipes.push(cur);continue;
-    }
+    const c0=(row[0]||'').trim();const c1=(row[1]||'').trim();const c2=(row[2]||'').trim();const c3=(row[3]||'').trim();const c12=(row[12]||'').trim();
+    const mLow=c12.toLowerCase();const isSL=mLow==='preparacion'||mLow==='preparación'||mLow==='emplatado';
+    const isStep=c12&&!isSL&&c12.length>3&&!c12.includes('$')&&!c12.includes('#');
+    const isH=SKIP_RE.test(c1);
+    const isRN=!c0&&c1&&!c2&&!c3&&!isH&&c1.length>2&&!isUnit(c1)&&!/^[\$#0-9]/.test(c1);
+    if(isRN){cur={name:c1,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',_ip:false};recipes.push(cur);continue;}
     if(!cur)continue;
-
-    // Detect section transition by col M label
-    if(mLow==='emplatado') cur._inPlate=true;
-    else if(mLow==='preparacion'||mLow==='preparación') cur._inPlate=false;
-
-    // Analysis rows
-    if(c9){
-      const label=c9.toUpperCase();
-      const val=cleanVal(c10);
-      if(label.includes('COSTO DEL PLATO'))cur.analysis.costo=val;
-      else if(label.includes('VALOR DE VENTA'))cur.analysis.venta=val;
-      else if(label.includes('GANANCIA'))cur.analysis.ganancia=val;
-      else if(label.includes('MARGEN.')&&!label.includes('ERROR'))cur.analysis.margen=c10;
-      else if(label.includes('IPOCONSUMO'))cur.analysis.ipo=val;
-      // Process text in col M on analysis rows
-      if(c12&&!isSectionLabel&&!isNotes){
-        if(cur._inPlate)cur.plateSteps.push(c12);
-        else cur.prepSteps.push(c12);
-      }
-      if(c12&&isNotes)cur._nextNote=true;
-      continue;
-    }
-    // Notes
-    if(cur._nextNote&&c1){cur.notes+=c1+' ';continue;}
-    if(cur._nextNote&&!c1)cur._nextNote=false;
-
-    // Ingredient rows
-    if(c1&&(c2||c5)&&!isHeader&&c1.length>1){
-      const costLine=cleanVal(c7)||cleanVal(c6);
-      cur.ingredients.push({name:c1,unit:c2,qty:c3,merma:c4,costo:costLine});
-      if(c12&&!isSectionLabel){
-        if(cur._inPlate)cur.plateSteps.push(c12);
-        else cur.prepSteps.push(c12);
-      }
-    }
-    // Total row
-    if(!c1&&cleanVal(c7))cur.totalCost=cleanVal(c7);
+    if(mLow==='emplatado')cur._ip=true;else if(mLow==='preparacion'||mLow==='preparación')cur._ip=false;
+    const cJ=(row[9]||'').trim().toUpperCase();const cK=(row[10]||'').trim();
+    if(cJ){if(cJ.includes('COSTO DEL PLATO'))cur.analysis.costo=cleanVal(cK);else if(cJ.includes('VALOR DE VENTA'))cur.analysis.venta=cleanVal(cK);else if(cJ.includes('GANANCIA'))cur.analysis.ganancia=cleanVal(cK);else if(cJ.includes('MARGEN.')&&!cJ.includes('ERROR'))cur.analysis.margen=cK;}
+    if(isStep){if(cur._ip)cur.plateSteps.push(c12);else cur.prepSteps.push(c12);}
+    if(c1&&!isH&&!isUnit(c1)&&c1.length>1&&(c2||c3)&&!c1.startsWith('$')&&!c1.startsWith('#')&&!/^[0-9]+$/.test(c1)){cur.ingredients.push({name:c1,unit:c2,qty:c3});}
   }
   return recipes.filter(r=>r.name&&r.ingredients.length>0);
 }
-
-async function loadSheet(sheet){
-  const url='https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&sheet='+encodeURIComponent(sheet.name);
-  try{
-    const r=await fetch(url);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const t=await r.text();
-    if(t.includes('/*O_o*/')||t.includes('<!DOCTYPE'))throw new Error('Not CSV');
-    return parseRecipes(parseCSV(t),sheet.name);
-  }catch(e){console.warn('Sheet:',sheet.name,e.message);return[];}
-}
-
-async function loadAll(){
-  setStatus('loading','Cargando recetas...');
-  allRecipes=[];
-  const results=await Promise.allSettled(SHEETS.map(s=>loadSheet(s)));
-  results.forEach((r,i)=>{if(r.status==='fulfilled')allRecipes.push(...r.value);});
-  buildSidebar();renderGrid();
-  setStatus('ok',allRecipes.length+' recetas cargadas • '+new Date().toLocaleTimeString('es-CO'));
-}
-
-function setStatus(s,t){
-  document.getElementById('status-dot').className='status-dot'+(s==='ok'?' ok':'');
-  document.getElementById('status-txt').textContent=t;
-}
-
-function buildSidebar(){
-  const cnt={};allRecipes.forEach(r=>{cnt[r.category]=(cnt[r.category]||0)+1;});
-  document.getElementById('count-all').textContent=allRecipes.length;
-  const sects={};
-  SHEETS.forEach(s=>{if(!cnt[s.name])return;if(!sects[s.section])sects[s.section]=[];sects[s.section].push({...s,count:cnt[s.name]});});
-  let h='';
-  for(const[sec,items]of Object.entries(sects)){
-    h+='<div class="sidebar-section">'+sec+'</div>';
-    items.forEach(s=>{
-      const id='si-'+s.name.replace(/ /g,'_');
-            h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(\''+s.name+'\')">'
-        +'<span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span>'
-        +'<span class="si-count">'+s.count+'</span></div>';
-    });
-  }
-  document.getElementById('sidebar-cats').innerHTML=h;
-}
-
-function filterCat(cat){
-  currentCat=cat;searchQ='';
-  document.getElementById('search-input').value='';
-  document.querySelectorAll('.sidebar-item').forEach(e=>e.classList.remove('active'));
-  document.getElementById('btn-all').classList.toggle('active',cat==='ALL');
-  if(cat!=='ALL'){const e=document.getElementById('si-'+cat.replace(/ /g,'_'));if(e)e.classList.add('active');}
-  renderGrid();
-}
-
+async function loadSheet(sh){const url='https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&gid='+sh.gid;try{const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(t.includes('/*O_o*/')||t.includes('<!DOCTYPE'))throw new Error('Not CSV');return parseRecipes(parseCSV(t),sh.name);}catch(e){console.warn('Sheet:',sh.name,e.message);return[];}}
+async function loadAll(){setStatus('loading','Cargando recetas...');allRecipes=[];const res=await Promise.allSettled(SHEETS.map(s=>loadSheet(s)));res.forEach(r=>{if(r.status==='fulfilled')allRecipes.push(...r.value);});buildSidebar();renderGrid();setStatus('ok',allRecipes.length+' recetas cargadas • '+new Date().toLocaleTimeString('es-CO'));}
+function setStatus(s,t){document.getElementById('status-dot').className='status-dot'+(s==='ok'?' ok':'');document.getElementById('status-txt').textContent=t;}
+function buildSidebar(){const cnt={};allRecipes.forEach(r=>{cnt[r.category]=(cnt[r.category]||0)+1;});document.getElementById('count-all').textContent=allRecipes.length;const sects={};SHEETS.forEach(s=>{if(!cnt[s.name])return;if(!sects[s.section])sects[s.section]=[];sects[s.section].push({...s,count:cnt[s.name]});});let h='';for(const[sec,items]of Object.entries(sects)){h+='<div class="sidebar-section">'+sec+'</div>';items.forEach(s=>{const id='si-'+s.name.replace(/ /g,'_');h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(\''+s.name+'\')">'+'<span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span>'+'<span class="si-count">'+s.count+'</span></div>';});}document.getElementById('sidebar-cats').innerHTML=h;}
+function filterCat(cat){currentCat=cat;searchQ='';document.getElementById('search-input').value='';document.querySelectorAll('.sidebar-item').forEach(e=>e.classList.remove('active'));document.getElementById('btn-all').classList.toggle('active',cat==='ALL');if(cat!=='ALL'){const e=document.getElementById('si-'+cat.replace(/ /g,'_'));if(e)e.classList.add('active');}renderGrid();}
 function handleSearch(){searchQ=document.getElementById('search-input').value.toLowerCase().trim();renderGrid();}
-
-function getFiltered(){
-  let l=allRecipes;
-  if(currentCat!=='ALL')l=l.filter(r=>r.category===currentCat);
-  if(searchQ)l=l.filter(r=>r.name.toLowerCase().includes(searchQ)||r.ingredients.some(i=>i.name.toLowerCase().includes(searchQ)));
-  return l;
-}
-
-function setView(m){
-  viewMode=m;
-  document.getElementById('btn-grid').classList.toggle('active',m==='grid');
-  document.getElementById('btn-list').classList.toggle('active',m==='list');
-  renderGrid();
-}
-
-function renderGrid(){
-  const list=getFiltered();
-  const cat=currentCat==='ALL'?'Todas las Recetas':currentCat.charAt(0)+currentCat.slice(1).toLowerCase();
-  document.getElementById('page-title').textContent=cat;
-  document.getElementById('page-sub').textContent=list.length+' receta'+(list.length===1?'':'s');
-  const grid=document.getElementById('grid');
-  grid.className='grid'+(viewMode==='list'?' list-mode':'');
-  if(!list.length){grid.innerHTML='<div class="empty-state"><p>🔍 No se encontraron recetas</p></div>';return;}
-  const icons={};SHEETS.forEach(s=>icons[s.name]=s.icon);
-  grid.innerHTML=list.map(r=>{
-    const idx=allRecipes.indexOf(r);
-    const steps=r.prepSteps.length+r.plateSteps.length;
-    return '<div class="card" onclick="openModal('+idx+')">'
-      +'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🍗</div><span>'+r.category+'</span></div></div>'
-      +'<div class="card-body">'
-      +'<div class="card-cat">'+r.category+'</div>'
-      +'<div class="card-name">'+r.name+'</div>'
-      +'<div class="card-divider"></div>'
-      +'<div class="card-meta">'
-      +'<span>'+r.ingredients.length+' ingrediente'+(r.ingredients.length===1?'':'s')+'</span>'
-      +(steps?'<span class="meta-steps">'+steps+' paso'+(steps===1?'':'s')+'</span>':'')
-      +'</div></div></div>';
-  }).join('');
-}
-
-function openModal(idx){
-  const r=allRecipes[idx];if(!r)return;
-  document.getElementById('m-cat').textContent=r.category;
-  document.getElementById('m-name').textContent=r.name;
-  const costoVal=r.analysis.costo||r.totalCost;
-  let body='';
-  if(costoVal!==null&&costoVal!==undefined){
-    body+='<div class="analysis-banner">';
-    body+='<div class="ab-item"><label>Costo del Plato</label><div class="ab-val">'+fmtMoney(costoVal)+'</div></div>';
-    if(r.analysis.venta)body+='<div class="ab-item"><label>Valor de Venta</label><div class="ab-val red">'+fmtMoney(r.analysis.venta)+'</div></div>';
-    if(r.analysis.ganancia)body+='<div class="ab-item"><label>Ganancia</label><div class="ab-val green">'+fmtMoney(r.analysis.ganancia)+'</div></div>';
-    if(r.analysis.margen)body+='<div class="ab-item"><label>Margen</label><div class="ab-val">'+r.analysis.margen+'</div></div>';
-    body+='</div>';
-  }
-  if(r.ingredients.length){
-    body+='<div class="section-block"><div class="section-title">Ingredientes</div>'
-      +'<table class="ing-table"><thead><tr><th>Artículo</th><th>Unidad</th><th>Cant.</th><th>Merma %</th><th class="th-r">Costo Línea</th></tr></thead><tbody>'
-      +r.ingredients.map(i=>'<tr><td class="td-name">'+i.name+'</td><td>'+(i.unit||'-')+'</td><td>'+(i.qty||'-')+'</td><td>'+(i.merma?i.merma+'%':'-')+'</td><td class="td-cost">'+fmtMoney(i.costo)+'</td></tr>').join('')
-      +'</tbody></table></div>';
-  }
-  if(r.prepSteps.length||r.plateSteps.length){
-    body+='<div class="steps-wrap">';
-    if(r.prepSteps.length){
-      body+='<div class="steps-section"><div class="steps-section-title">Preparación</div>'
-        +r.prepSteps.map((s,i)=>'<div class="step-item"><div class="step-num orange">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')
-        +'</div>';
-    }
-    if(r.plateSteps.length){
-      body+='<div class="steps-section"><div class="steps-section-title">Emplatado</div>'
-        +r.plateSteps.map((s,i)=>'<div class="step-item"><div class="step-num teal">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')
-        +'</div>';
-    }
-    body+='</div>';
-  }
-  if(r.notes&&r.notes.trim()){
-    body+='<div class="notes-block"><div class="notes-title">Notas de Cocina</div><div class="notes-text">'+r.notes.trim()+'</div></div>';
-  }
-  document.getElementById('modal-body').innerHTML=body;
-  document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
+function getFiltered(){let l=allRecipes;if(currentCat!=='ALL')l=l.filter(r=>r.category===currentCat);if(searchQ)l=l.filter(r=>r.name.toLowerCase().includes(searchQ)||r.ingredients.some(i=>i.name.toLowerCase().includes(searchQ)));return l;}
+function setView(m){viewMode=m;document.getElementById('btn-grid').classList.toggle('active',m==='grid');document.getElementById('btn-list').classList.toggle('active',m==='list');renderGrid();}
+function renderGrid(){const list=getFiltered();const cat=currentCat==='ALL'?'Todas las Recetas':currentCat.charAt(0)+currentCat.slice(1).toLowerCase();document.getElementById('page-title').textContent=cat;document.getElementById('page-sub').textContent=list.length+' receta'+(list.length===1?'':'s');const grid=document.getElementById('grid');grid.className='grid'+(viewMode==='list'?' list-mode':'');if(!list.length){grid.innerHTML='<div class="empty-state"><p>No se encontraron recetas</p></div>';return;}grid.innerHTML=list.map(r=>{const idx=allRecipes.indexOf(r);const steps=r.prepSteps.length+r.plateSteps.length;return '<div class="card" onclick="openModal('+idx+')">'+'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🍗</div><span>'+r.category+'</span></div></div>'+'<div class="card-body"><div class="card-cat">'+r.category+'</div><div class="card-name">'+r.name+'</div>'+'<div class="card-divider"></div><div class="card-meta">'+'<span>'+r.ingredients.length+' ingrediente'+(r.ingredients.length===1?'':'s')+'</span>'+(steps?'<span class="meta-steps">'+steps+' paso'+(steps===1?'':'s')+'</span>':'')+'</div></div></div>';}).join('');}
+function openModal(idx){const r=allRecipes[idx];if(!r)return;document.getElementById('m-cat').textContent=r.category;document.getElementById('m-name').textContent=r.name;const cv=r.analysis.costo||r.totalCost;let body='';if(cv!=null){body+='<div class="analysis-banner"><div class="ab-item"><label>Costo del Plato</label><div class="ab-val">$'+Math.round(cv).toLocaleString('es-CO')+'</div></div>';if(r.analysis.venta)body+='<div class="ab-item"><label>Valor de Venta</label><div class="ab-val red">$'+Math.round(r.analysis.venta).toLocaleString('es-CO')+'</div></div>';if(r.analysis.ganancia)body+='<div class="ab-item"><label>Ganancia</label><div class="ab-val green">$'+Math.round(r.analysis.ganancia).toLocaleString('es-CO')+'</div></div>';if(r.analysis.margen)body+='<div class="ab-item"><label>Margen</label><div class="ab-val">'+r.analysis.margen+'</div></div>';body+='</div>';}
+if(r.ingredients.length){body+='<div class="section-block"><div class="section-title">Ingredientes</div><table class="ing-table"><thead><tr><th>Artículo</th><th>Unidad de Medida</th><th>Cantidad</th></tr></thead><tbody>'+r.ingredients.map(i=>'<tr><td class="td-name">'+i.name+'</td><td>'+(i.unit||'-')+'</td><td>'+(i.qty||'-')+'</td></tr>').join('')+'</tbody></table></div>';}
+if(r.prepSteps.length||r.plateSteps.length){body+='<div class="steps-wrap">';if(r.prepSteps.length){body+='<div class="steps-section"><div class="steps-section-title">Preparación</div>'+r.prepSteps.map((s,i)=>'<div class="step-item"><div class="step-num orange">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')+'</div>';}if(r.plateSteps.length){body+='<div class="steps-section"><div class="steps-section-title">Emplatado</div>'+r.plateSteps.map((s,i)=>'<div class="step-item"><div class="step-num teal">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>').join('')+'</div>';}body+='</div>';}
+if(r.notes&&r.notes.trim()){body+='<div class="notes-block"><div class="notes-title">Notas de Cocina</div><div class="notes-text">'+r.notes.trim()+'</div></div>';}document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-bg').classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(e){if(e.target===document.getElementById('modal-bg'))closeModalDirect();}
 function closeModalDirect(){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';}
-
-loadAll();
-setInterval(loadAll,5*60*1000);
+loadAll();setInterval(loadAll,5*60*1000);
 </script>
 </body>
                                                                   </html>
