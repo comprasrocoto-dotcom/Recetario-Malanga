@@ -235,22 +235,42 @@ const SKIP_RE=/^(art\u00EDculo|art\u00C3|artículo|articulo|ingrediente|und\b|un
 const UNIT_WORDS=['g','kg','uds','und','ml','l','oz','lb','gr','cc','porciones','onz'];
 function isUnit(v){return UNIT_WORDS.includes((v||'').toLowerCase().trim());}
 function parseRecipes(rows,sheetName){
-  const recipes=[];let cur=null;
-  for(const row of rows){
-    const c0=(row[0]||'').trim();const c1=(row[1]||'').trim();const c2=(row[2]||'').trim();const c3=(row[3]||'').trim();const c12=(row[12]||'').trim();
-    const mLow=c12.toLowerCase();const isSL=mLow==='preparacion'||mLow==='preparación'||mLow==='emplatado';
-    const isStep=c12&&!isSL&&c12.length>3&&!c12.includes('$')&&!c12.includes('#');
-    const isH=SKIP_RE.test(c1)||/^(unidad|unidades)/i.test(c2);
-    const isRN=!c0&&c1&&!c2&&!c3&&!isH&&c1.length>2&&!isUnit(c1)&&!/^[\$#0-9]/.test(c1);
-    if(isRN){cur={name:c1,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',_ip:false};recipes.push(cur);continue;}
-    if(!cur)continue;
-    if(mLow==='emplatado')cur._ip=true;else if(mLow==='preparacion'||mLow==='preparación')cur._ip=false;
-    const cJ=(row[9]||'').trim().toUpperCase();const cK=(row[10]||'').trim();
-    if(cJ){if(cJ.includes('COSTO DEL PLATO'))cur.analysis.costo=cleanVal(cK);else if(cJ.includes('VALOR DE VENTA'))cur.analysis.venta=cleanVal(cK);else if(cJ.includes('GANANCIA'))cur.analysis.ganancia=cleanVal(cK);else if(cJ.includes('MARGEN.')&&!cJ.includes('ERROR'))cur.analysis.margen=cK;}
-    if(isStep){if(cur._ip)cur.plateSteps.push(c12);else cur.prepSteps.push(c12);}
-    if(c1&&!isH&&!isUnit(c1)&&c1.length>1&&(c2||c3)&&!c1.startsWith('$')&&!c1.startsWith('#')&&!/^[0-9]+$/.test(c1)){cur.ingredients.push({name:c1,unit:c2,qty:c3});}
-  }
-  return recipes.filter(r=>r.name&&r.ingredients.length>0);
+const recipes=[];let cur=null;
+// Detect format: check if recipe names appear in col A (spirits) or col B (cooking)
+// Spirit format: col A has name, col B empty — cooking: col B has name, col A empty
+let fmt='B';
+for(const row of rows){
+const c0=(row[0]||'').trim();const c1=(row[1]||'').trim();
+if(c0&&!c1&&c0.length>3&&!SKIP_RE.test(c0)&&!c0.includes('$')&&!c0.match(/^[0-9]/)){fmt='A';break;}
+if(!c0&&c1&&c1.length>3&&!SKIP_RE.test(c1)&&!c1.includes('$')&&!c1.match(/^[0-9]/)){fmt='B';break;}
+}
+for(const row of rows){
+const c0=(row[0]||'').trim();const c1=(row[1]||'').trim();const c2=(row[2]||'').trim();const c3=(row[3]||'').trim();const c4=(row[4]||'').trim();const c12=(row[12]||'').trim();
+const mLow=c12.toLowerCase();const isSL=mLow==='preparacion'||mLow==='preparación'||mLow==='emplatado';
+const isStep=c12&&!isSL&&c12.length>3&&!c12.includes('$')&&!c12.includes('#');
+if(fmt==='B'){
+// COOKING FORMAT: recipe name in col B, ingredients: B=article, C=unit, D=qty
+const isH=SKIP_RE.test(c1)||/^(unidad|unidades)/i.test(c2);
+const isRN=!c0&&c1&&!c2&&!c3&&!isH&&c1.length>2&&!isUnit(c1)&&!/^[\$#0-9]/.test(c1);
+if(isRN){cur={name:c1,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',_ip:false};recipes.push(cur);continue;}
+if(!cur)continue;
+if(mLow==='emplatado')cur._ip=true;else if(mLow==='preparacion'||mLow==='preparación')cur._ip=false;
+const cJ=(row[9]||'').trim().toUpperCase();const cK=(row[10]||'').trim();
+if(cJ){if(cJ.includes('COSTO DEL PLATO'))cur.analysis.costo=cleanVal(cK);else if(cJ.includes('VALOR DE VENTA'))cur.analysis.venta=cleanVal(cK);else if(cJ.includes('GANANCIA'))cur.analysis.ganancia=cleanVal(cK);else if(cJ.includes('MARGEN.')&&!cJ.includes('ERROR'))cur.analysis.margen=cK;}
+if(isStep){if(cur._ip)cur.plateSteps.push(c12);else cur.prepSteps.push(c12);}
+if(c1&&!isH&&!isUnit(c1)&&c1.length>1&&(c2||c3)&&!c1.startsWith('$')&&!c1.startsWith('#')&&!/^[0-9]+$/.test(c1)){cur.ingredients.push({name:c1,unit:c2,qty:c3});}
+}else{
+// SPIRIT FORMAT: recipe name in col A, ingredients: A=article, B=unit, E=qty(unidades netas)
+const isH=SKIP_RE.test(c0)||/^(unidad|unidades)/i.test(c1);
+const isRN=c0&&!c1&&!c2&&!isH&&c0.length>2&&!isUnit(c0)&&!/^[\$#0-9]/.test(c0)&&!c0.includes('$');
+if(isRN){cur={name:c0,category:sheetName,ingredients:[],analysis:{},prepSteps:[],plateSteps:[],notes:'',_ip:false};recipes.push(cur);continue;}
+if(!cur)continue;
+const c8=(row[8]||'').trim().toUpperCase();const c9=(row[9]||'').trim();
+if(c8){if(c8.includes('COSTO DEL PLATO'))cur.analysis.costo=cleanVal(c9);else if(c8.includes('VALOR DE VENTA'))cur.analysis.venta=cleanVal(c9);else if(c8.includes('GANANCIA'))cur.analysis.ganancia=cleanVal(c9);else if(c8.includes('MARGEN.')&&!c8.includes('ERROR'))cur.analysis.margen=c9;}
+if(c0&&!isH&&!isUnit(c0)&&c0.length>1&&(c1||c4)&&!c0.startsWith('$')&&!/^[0-9]+$/.test(c0)){cur.ingredients.push({name:c0,unit:c1,qty:c4});}
+}
+}
+return recipes.filter(r=>r.name&&r.ingredients.length>0);
 }
 async function loadSheet(sh){const url='https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&gid='+sh.gid;try{const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();if(t.includes('/*O_o*/')||t.includes('<!DOCTYPE'))throw new Error('Not CSV');return parseRecipes(parseCSV(t),sh.name);}catch(e){console.warn('Sheet:',sh.name,e.message);return[];}}
 async function loadAll(){setStatus('loading','Cargando recetas...');allRecipes=[];const res=await Promise.allSettled(SHEETS.map(s=>loadSheet(s)));res.forEach(r=>{if(r.status==='fulfilled')allRecipes.push(...r.value);});buildSidebar();renderGrid();setStatus('ok',allRecipes.length+' recetas cargadas • '+new Date().toLocaleTimeString('es-CO'));}
