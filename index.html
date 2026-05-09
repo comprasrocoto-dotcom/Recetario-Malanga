@@ -11,7 +11,7 @@
 --green:#2B4D2E;--dark:#1a2e1c;--mid:#3d5c40;--light:#5a7a5d;
 --white:#ffffff;--shadow:0 2px 16px rgba(43,77,46,.15);
 --red:#cc2200;--sidebar:#2B4D2E;--border:#c8d8c9;--card:#ffffff;
---accent:#2B4D2E;--accent2:#1e3820;
+--accent:#2B4D2E;--accent2:#1e3820;h
 }
 body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var(--dark);display:flex;min-height:100vh}
 .sidebar{width:260px;min-width:260px;background:var(--sidebar);border-right:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
@@ -257,7 +257,7 @@ const cnt={};allRecipes.forEach(r=>{cnt[r.category]=(cnt[r.category]||0)+1;});
 document.getElementById('count-all').textContent=allRecipes.length;
 const sects={};SHEETS.forEach(s=>{if(!cnt[s.name])return;if(!sects[s.section])sects[s.section]=[];sects[s.section].push({...s,count:cnt[s.name]});});
 let h='';
-for(const[sec,items]of Object.entries(sects)){h+='<div class="sidebar-section">'+sec+'</div>';items.forEach(s=>{const id='si-'+s.name.replace(/ /g,'_');h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(''+s.name+'')"><span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span><span class="si-count">'+s.count+'</span></div>';});}
+for(const[sec,items]of Object.entries(sects)){h+='<div class="sidebar-section">'+sec+'</div>';items.forEach(s=>{const id='si-'+s.name.replace(/ /g,'_');h+='<div class="sidebar-item" id="'+id+'" onclick="filterCat(this.dataset.cat)" data-cat="'+s.name+'"><span class="si-left"><span class="si-icon">'+s.icon+'</span>'+s.name.charAt(0)+s.name.slice(1).toLowerCase()+'</span><span class="si-count">'+s.count+'</span></div>';});}
 document.getElementById('sidebar-cats').innerHTML=h;
 }
 function filterCat(cat){currentCat=cat;searchQ='';document.getElementById('search-input').value='';document.querySelectorAll('.sidebar-item').forEach(e=>e.classList.remove('active'));document.getElementById('btn-all').classList.toggle('active',cat==='ALL');if(cat!=='ALL'){const e=document.getElementById('si-'+cat.replace(/ /g,'_'));if(e)e.classList.add('active');}renderGrid();}
