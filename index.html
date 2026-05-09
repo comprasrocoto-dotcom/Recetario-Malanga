@@ -196,8 +196,7 @@ let allRecipes=[],currentCat='ALL',searchQ='',viewMode='grid';
 const SKIP_RE=/^(artículo|articulo|ingrediente|und|unidad|coste|costo|item|total|columna)/i;
 const UNIT_WORDS=['g','kg','uds','und','ml','l','oz','lb','gr','cc','porciones','onz'];
 function isUnit(v){return UNIT_WORDS.includes((v||'').toLowerCase().trim());}
-function parseCSV(t){const rows=[];for(const line of t.split('
-')){const cols=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=ch;}cols.push(cur.trim());rows.push(cols);}return rows;}
+function parseCSV(t){const rows=[];for(const line of t.split('\n')){const cols=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=ch;}cols.push(cur.trim());rows.push(cols);}return rows;}
 function cleanVal(v){if(!v)return null;const s=v.replace(/[^0-9.,]/g,'').replace(',','.');return s?parseFloat(s):null;}
 function parseRecipes(rows,sheetName){
   const recipes=[];let cur=null;
