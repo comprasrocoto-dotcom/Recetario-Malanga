@@ -52,7 +52,7 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 .card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;border:1px solid var(--border);box-shadow:0 1px 6px rgba(43,77,46,.08)}
 .card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .card-img{height:160px;background:var(--cream2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.card-img img{width:100%;height:100%;object-fit:contain;max-height:100%}
+.card-img img{width:100%;height:100%;object-fit:cover}
 .card-img-ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--light);font-size:.75rem}
 .logo-plate{font-size:2.5rem}
 .list-mode .card{display:flex;flex-direction:row}
@@ -335,7 +335,7 @@ function filterCat(cat){currentCat=cat;searchQ='';document.getElementById('searc
 function handleSearch(){searchQ=document.getElementById('search-input').value.toLowerCase().trim();renderGrid();}
 function getFiltered(){let l=allRecipes;if(currentCat!=='ALL')l=l.filter(r=>r.category===currentCat);if(searchQ)l=l.filter(r=>r.name.toLowerCase().includes(searchQ)||r.ingredients.some(i=>i.name.toLowerCase().includes(searchQ)));return l;}
 function setView(m){viewMode=m;document.getElementById('btn-grid').classList.toggle('active',m==='grid');document.getElementById('btn-list').classList.toggle('active',m==='list');renderGrid();}
-function driveUrl(id){return'https://drive.google.com/thumbnail?id='+id+'&sz=w800';}function getCardImg(r){const ph=PHOTOS[r.name.toUpperCase().trim()];if(ph)return'<div class="card-img card-img-photo"><img src="'+driveUrl(ph)+'" alt="" loading="lazy" onerror="this.parentElement.className=\"card-img\""></div>';return'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🌿</div><span>'+r.category+'</span></div></div>';}
+function driveUrl(id){return'https://drive.google.com/thumbnail?id='+id+'&sz=w400';}function getCardImg(r){const ph=PHOTOS[r.name.toUpperCase().trim()];if(ph)return'<div class="card-img card-img-photo"><img src="'+driveUrl(ph)+'" alt="" loading="lazy" onerror="this.parentElement.className=\"card-img\""></div>';return'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🌿</div><span>'+r.category+'</span></div></div>';}
 function renderGrid(){
 const list=getFiltered();const cat=currentCat==='ALL'?'Todas las Recetas':currentCat.charAt(0)+currentCat.slice(1).toLowerCase();
 document.getElementById('page-title').textContent=cat;document.getElementById('page-sub').textContent=list.length+' receta'+(list.length===1?'':'s');
