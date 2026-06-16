@@ -75,7 +75,8 @@ body{font-family:'Segoe UI',Georgia,sans-serif;background:var(--cream);color:var
 .modal-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;flex-shrink:0}
 .modal-close:hover{background:rgba(255,255,255,.25)}
 .modal-body{overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;background:#fff}
-.modal-photo img{width:100%;max-height:300px;object-fit:contain;border-radius:10px;background:var(--cream)}
+.modal-photo{width:100%;border-radius:10px;overflow:hidden;background:var(--cream)}
+.modal-photo img{display:block;width:100%;height:auto;max-height:340px;object-fit:contain}
 .section-title{font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
 .ing-table{width:100%;border-collapse:collapse;font-size:.85rem}
 .ing-table th{text-align:left;padding:6px 8px;color:var(--light);font-weight:600;border-bottom:2px solid var(--border)}
@@ -336,7 +337,7 @@ function filterCat(cat){currentCat=cat;searchQ='';document.getElementById('searc
 function handleSearch(){searchQ=document.getElementById('search-input').value.toLowerCase().trim();renderGrid();}
 function getFiltered(){let l=allRecipes;if(currentCat!=='ALL')l=l.filter(r=>r.category===currentCat);if(searchQ)l=l.filter(r=>r.name.toLowerCase().includes(searchQ)||r.ingredients.some(i=>i.name.toLowerCase().includes(searchQ)));return l;}
 function setView(m){viewMode=m;document.getElementById('btn-grid').classList.toggle('active',m==='grid');document.getElementById('btn-list').classList.toggle('active',m==='list');renderGrid();}
-function driveUrl(id){return'https://drive.google.com/thumbnail?id='+id+'&sz=w400';}function getCardImg(r){const ph=PHOTOS[r.name.toUpperCase().trim()];if(ph)return'<div class="card-img card-img-photo"><img src="'+driveUrl(ph)+'" alt="" loading="lazy" onerror="this.parentElement.className=\"card-img\""></div>';return'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🌿</div><span>'+r.category+'</span></div></div>';}
+function driveUrl(id){return'https://lh3.googleusercontent.com/d/'+id+'=w1000';}function getCardImg(r){const ph=PHOTOS[r.name.toUpperCase().trim()];if(ph)return'<div class="card-img card-img-photo"><img src="'+driveUrl(ph)+'" alt="" loading="lazy" onerror="this.parentElement.className=\"card-img\""></div>';return'<div class="card-img"><div class="card-img-ph"><div class="logo-plate">🌿</div><span>'+r.category+'</span></div></div>';}
 function renderGrid(){
 const list=getFiltered();const cat=currentCat==='ALL'?'Todas las Recetas':currentCat.charAt(0)+currentCat.slice(1).toLowerCase();
 document.getElementById('page-title').textContent=cat;document.getElementById('page-sub').textContent=list.length+' receta'+(list.length===1?'':'s');
