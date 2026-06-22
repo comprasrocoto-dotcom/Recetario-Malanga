@@ -146,15 +146,19 @@ body{
 .modal-body{overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;background:#fff}
 
 /* FOTO DEL MODAL ----------------------------------------------------------
-   Las fotos pueden ser verticales (retrato) u horizontales. Para mostrarlas
-   SIEMPRE completas (sin recortar) y centradas:
-   - El contenedor centra con flexbox y usa el fondo crema como marco.
-   - La imagen toma su tamaño natural (width/height:auto) limitada por
-     max-width:100% y max-height:520px; object-fit:contain garantiza que
-     entre completa. Así una foto vertical se ve grande y centrada en vez de
-     quedar aplastada a todo el ancho. */
-.modal-photo{width:100%;border-radius:10px;overflow:hidden;background:var(--cream);display:flex;align-items:center;justify-content:center}
-.modal-photo img{display:block;max-width:100%;max-height:520px;width:auto;height:auto;object-fit:contain;margin:0 auto}
+   Comportamiento UNIVERSAL: se adapta a CUALQUIER foto (vertical, horizontal,
+   cuadrada, gigante o pequeña) y siempre se ve COMPLETA, sin recortarse.
+   Cómo: la imagen conserva su proporción natural (width/height:auto) y solo se
+   limita su tamaño con dos topes:
+     - max-width:100%            -> nunca más ancha que el modal.
+     - max-height:min(60vh,560px) -> nunca más alta que ~60% de la pantalla
+                                      (con tope duro de 560px). Se adapta al
+                                      tamaño de la ventana.
+   La que mande primero (alto o ancho) es la que ajusta; la imagen se reduce
+   proporcionalmente hasta entrar entera. El contenedor la centra con flexbox y
+   es transparente (no deja barras de color): el marco "abraza" la foto. */
+.modal-photo{width:100%;display:flex;align-items:center;justify-content:center;background:transparent}
+.modal-photo img{display:block;max-width:100%;max-height:min(60vh,560px);width:auto;height:auto;border-radius:10px}
 
 /* Tabla de ingredientes */
 .section-title{font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
@@ -558,7 +562,10 @@ async function loadAll(){
   }
   buildSidebar();
   renderGrid();
-  setStatus('ok',allRecipes.length+' recetas cargadas • '+new Date().toLocaleTimeString('es-CO'));
+  // 'v2-foto' es un marcador de versión: si lo ves en la barra de estado del
+  // sitio desplegado, confirma que este código (con el arreglo de la foto) está
+  // realmente en vivo. Puedes quitarlo cuando ya no lo necesites.
+  setStatus('ok',allRecipes.length+' recetas cargadas • v2-foto • '+new Date().toLocaleTimeString('es-CO'));
 }
 
 /** Actualiza el indicador de estado (punto + texto). @param {string} s @param {string} t */
