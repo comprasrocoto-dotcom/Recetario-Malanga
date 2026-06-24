@@ -400,6 +400,23 @@ function isUnit(v){
   return UNIT_WORDS.includes((v||'').toLowerCase().trim());
 }
 
+  /** Formatea una cantidad: enteros sin decimales, decimales significativos
+   *  sin ceros sobrantes, y corrige errores de punto flotante (p.ej. 50.000001 -> 50). */
+  function fmtQty(v){
+    if(v==null) return '-';
+    if(typeof v==='string'){
+      var s=v.trim();
+      if(s==='') return '-';
+      var nstr=s.replace(/\s/g,'').replace(',', '.');
+      var nn=Number(nstr);
+      if(!isFinite(nn)) return s;
+      v=nn;
+    }
+    if(typeof v!=='number'||!isFinite(v)) return String(v);
+    var r=Math.round(v*10000)/10000;
+    return parseFloat(r.toFixed(4)).toString();
+  }
+
 /* ===========================================================================
    PARSEO DE CSV
    =========================================================================== */
@@ -697,12 +714,12 @@ function openModal(idx){
 
   // Tabla de ingredientes.
   if(r.ingredients.length){
-    body+='<div class="section-block"><div class="section-title">Ingredientes</div><table class="ing-table"><thead><tr><th>Artículo</th><th>Unidad de Medida</th><th>Cantidad</th></tr></thead><tbody>'+r.ingredients.map(i=>'<tr><td class="td-name">'+i.name+'</td><td>'+(i.unit||'-')+'</td><td>'+(i.qty||'-')+'</td></tr>').join('')+'</tbody></table></div>';
+    body+='<div class="section-block"><div class="section-title">Ingredientes</div><table class="ing-table"><thead><tr><th>Artículo</th><th>Unidad de Medida</th><th>Cantidad</th></tr></thead><tbody>'+r.ingredients.map(i=>'<tr><td class="td-name">'+i.name+'</td><td>'+(i.unit||'-')+'</td><td>'+fmtQty(i.qty)+'</td></tr>').join('')+'</tbody></table></div>';
   }
 
   // Rendimiento (opcional).
   if(r.rendimiento){
-    body+='<div class="rendimiento-wrap"><span class="rendimiento-label">Rendimiento</span><span class="rendimiento-badge">⚖ '+r.rendimiento+' g</span></div>';
+    body+='<div class="rendimiento-wrap"><span class="rendimiento-label">Rendimiento</span><span class="rendimiento-badge">⚖ '+fmtQty(r.rendimiento)+' g</span></div>';
   }
 
   // Pasos: Preparación (numeración naranja) y Emplatado (numeración teal).
